@@ -21,6 +21,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository        userRepository;
     private final JobRepository         jobRepository;
+    private final EmailService          emailService;
     @Lazy
     private final MatchingService       matchingService;
 
@@ -39,8 +40,8 @@ public class ApplicationService {
         app.setCoverLetter(request.getCoverLetter());
         Application saved = applicationRepository.save(app);
 
-        // Auto-compute match score immediately on application
         matchingService.computeAndSave(saved);
+        emailService.sendApplicationConfirmation(saved); // async — non-blocking
         return saved;
     }
 
@@ -53,10 +54,13 @@ public class ApplicationService {
         return applicationRepository.findByJobId(jobId);
     }
 
+    @Transactional
     public Application updateStatus(Long appId, JobDto.StatusUpdateRequest request) {
         Application app = applicationRepository.findById(appId)
                 .orElseThrow(() -> new RuntimeException("Application not found"));
         app.setStatus(request.getStatus());
-        return applicationRepository.save(app);
+        Application saved = applicationRepository.save(app);
+        emailService.sendStatusUpdate(saved);             // async — non-blocking
+        return saved;
     }
 }
