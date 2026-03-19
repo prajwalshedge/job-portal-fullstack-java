@@ -6,6 +6,7 @@ import com.jobportal.model.User;
 import com.jobportal.repository.ResumeRepository;
 import com.jobportal.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,11 +18,13 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class ResumeService {
 
-    private final ResumeRepository    resumeRepository;
-    private final UserRepository      userRepository;
-    private final ResumeStorageService storageService;
-    private final PdfTextExtractor    pdfTextExtractor;
+    private final ResumeRepository      resumeRepository;
+    private final UserRepository        userRepository;
+    private final ResumeStorageService  storageService;
+    private final PdfTextExtractor      pdfTextExtractor;
     private final SkillExtractorService skillExtractor;
+    @Lazy
+    private final MatchingService       matchingService;
 
     @Transactional
     public ResumeDto.ResumeResponse upload(MultipartFile file, String email) throws IOException {
@@ -60,6 +63,9 @@ public class ResumeService {
         user.setSkills(skills);
         user.setResumeLink(storedPath);
         userRepository.save(user);
+
+        // 6. Recompute match scores for all existing applications with the new resume
+        matchingService.recomputeForUser(user.getId());
 
         return ResumeDto.ResumeResponse.from(resume);
     }

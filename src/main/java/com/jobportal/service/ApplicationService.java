@@ -8,7 +8,9 @@ import com.jobportal.repository.ApplicationRepository;
 import com.jobportal.repository.JobRepository;
 import com.jobportal.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,7 +21,10 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository        userRepository;
     private final JobRepository         jobRepository;
+    @Lazy
+    private final MatchingService       matchingService;
 
+    @Transactional
     public Application apply(Long jobId, JobDto.ApplicationRequest request, String email) {
         User applicant = userRepository.findByEmail(email).orElseThrow();
         if (applicationRepository.existsByJobIdAndApplicantId(jobId, applicant.getId()))
@@ -32,7 +37,11 @@ public class ApplicationService {
         app.setJob(job);
         app.setApplicant(applicant);
         app.setCoverLetter(request.getCoverLetter());
-        return applicationRepository.save(app);
+        Application saved = applicationRepository.save(app);
+
+        // Auto-compute match score immediately on application
+        matchingService.computeAndSave(saved);
+        return saved;
     }
 
     public List<Application> myApplications(String email) {
