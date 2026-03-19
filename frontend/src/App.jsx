@@ -14,37 +14,32 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Navbar />
-        <main className="min-h-screen">
-          <Routes>
-            <Route path="/" element={<Navigate to="/jobs" replace />} />
+        <div className="min-h-screen flex flex-col bg-surface-950 text-slate-100">
+          <Navbar />
+          <main className="flex-1 flex flex-col">
+            <Routes>
+              <Route path="/" element={<Navigate to="/jobs" replace />} />
 
-            {/* Guest-only — redirect logged-in users away */}
-            <Route path="/login"    element={<ProtectedRoute guestOnly><LoginPage /></ProtectedRoute>} />
-            <Route path="/register" element={<ProtectedRoute guestOnly><RegisterPage /></ProtectedRoute>} />
+              <Route path="/login"    element={<ProtectedRoute guestOnly><LoginPage /></ProtectedRoute>} />
+              <Route path="/register" element={<ProtectedRoute guestOnly><RegisterPage /></ProtectedRoute>} />
 
-            {/* Public */}
-            <Route path="/jobs"     element={<JobsPage />} />
-            <Route path="/jobs/:id" element={<JobDetailPage />} />
+              <Route path="/jobs"     element={<JobsPage />} />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
 
-            {/* Job seeker */}
-            <Route path="/profile" element={
-              <ProtectedRoute role="USER"><ProfilePage /></ProtectedRoute>
-            } />
+              <Route path="/profile" element={
+                <ProtectedRoute role="USER"><ProfilePage /></ProtectedRoute>
+              } />
+              <Route path="/dashboard" element={
+                <ProtectedRoute role="RECRUITER"><RecruiterDashboard /></ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>
+              } />
 
-            {/* Recruiter */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute role="RECRUITER"><RecruiterDashboard /></ProtectedRoute>
-            } />
-
-            {/* Admin */}
-            <Route path="/admin" element={
-              <ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>
-            } />
-
-            <Route path="*" element={<Navigate to="/jobs" replace />} />
-          </Routes>
-        </main>
+              <Route path="*" element={<Navigate to="/jobs" replace />} />
+            </Routes>
+          </main>
+        </div>
       </BrowserRouter>
     </AuthProvider>
   );
