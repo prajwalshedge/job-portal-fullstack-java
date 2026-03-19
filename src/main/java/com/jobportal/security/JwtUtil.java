@@ -1,5 +1,6 @@
 package com.jobportal.security;
 
+import com.jobportal.model.Role;
 import com.jobportal.model.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -26,11 +27,20 @@ public class JwtUtil {
     }
 
     public String generateToken(User user) {
-        return buildToken(user.getEmail(), user.getRole().name(), expirationMs);
+        return buildToken(user.getEmail(), highestRole(user), expirationMs);
     }
 
     public String generateRefreshToken(User user) {
-        return buildToken(user.getEmail(), user.getRole().name(), refreshExpirationMs);
+        return buildToken(user.getEmail(), highestRole(user), refreshExpirationMs);
+    }
+
+    // ADMIN > RECRUITER > USER — pick the highest privilege role for the JWT claim
+    private String highestRole(User user) {
+        var names = user.getRoles().stream()
+                .map(r -> r.getName().name()).collect(java.util.stream.Collectors.toSet());
+        if (names.contains(Role.RoleName.ADMIN.name()))     return Role.RoleName.ADMIN.name();
+        if (names.contains(Role.RoleName.RECRUITER.name())) return Role.RoleName.RECRUITER.name();
+        return Role.RoleName.USER.name();
     }
 
     private String buildToken(String email, String role, long expiry) {

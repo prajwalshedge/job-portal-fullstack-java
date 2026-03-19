@@ -16,7 +16,7 @@ public class AuthDto {
         private String password;
         @NotBlank
         private String fullName;
-        private User.Role role = User.Role.USER;
+        private String role = "USER";  // accepts "USER", "RECRUITER", "ADMIN"
     }
 
     @Data
@@ -33,14 +33,16 @@ public class AuthDto {
         private String refreshToken;
         private String email;
         private String fullName;
-        private User.Role role;
+        private String role;
 
         public AuthResponse(String accessToken, String refreshToken, User user) {
             this.accessToken = accessToken;
             this.refreshToken = refreshToken;
             this.email = user.getEmail();
             this.fullName = user.getFullName();
-            this.role = user.getRole();
+            this.role = user.getRoles().stream()
+                    .map(r -> r.getName().name())
+                    .collect(java.util.stream.Collectors.joining(","));
         }
     }
 
@@ -49,13 +51,19 @@ public class AuthDto {
         private Long id;
         private String email;
         private String fullName;
-        private User.Role role;
+        private String skills;
+        private String resumeLink;
+        private String role;
 
         public MeResponse(User user) {
             this.id = user.getId();
             this.email = user.getEmail();
             this.fullName = user.getFullName();
-            this.role = user.getRole();
+            this.skills = user.getSkills();
+            this.resumeLink = user.getResumeLink();
+            this.role = user.getRoles().stream()
+                    .map(r -> r.getName().name())
+                    .collect(java.util.stream.Collectors.joining(","));
         }
     }
 }

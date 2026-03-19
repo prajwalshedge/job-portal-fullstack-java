@@ -1,10 +1,15 @@
 package com.jobportal.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.time.LocalDateTime;
+import lombok.*;
 
-@Data
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "jobs")
 public class Job {
@@ -19,18 +24,29 @@ public class Job {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String company;
 
     private String location;
     private String salary;
 
+    @Column(name = "required_skills", length = 500)
+    private String requiredSkills;
+
+    @Column(name = "experience_years")
+    private Integer experienceYears;
+
     @Enumerated(EnumType.STRING)
     private JobType jobType = JobType.FULL_TIME;
 
+    // ManyToOne — many jobs can be posted by one recruiter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "posted_by", nullable = false)
-    private User postedBy;
+    @JoinColumn(name = "recruiter_id", nullable = false)
+    private Recruiter postedBy;
+
+    // OneToMany — one job can have many applications
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Application> applications = new ArrayList<>();
 
     private boolean active = true;
 
