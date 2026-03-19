@@ -16,7 +16,7 @@ public class AuthDto {
         private String password;
         @NotBlank
         private String fullName;
-        private User.Role role = User.Role.JOB_SEEKER;
+        private User.Role role = User.Role.USER;
     }
 
     @Data
@@ -29,13 +29,30 @@ public class AuthDto {
 
     @Data
     public static class AuthResponse {
-        private String token;
+        private String accessToken;
+        private String refreshToken;
         private String email;
         private String fullName;
         private User.Role role;
 
-        public AuthResponse(String token, User user) {
-            this.token = token;
+        public AuthResponse(String accessToken, String refreshToken, User user) {
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
+            this.email = user.getEmail();
+            this.fullName = user.getFullName();
+            this.role = user.getRole();
+        }
+    }
+
+    @Data
+    public static class MeResponse {
+        private Long id;
+        private String email;
+        private String fullName;
+        private User.Role role;
+
+        public MeResponse(User user) {
+            this.id = user.getId();
             this.email = user.getEmail();
             this.fullName = user.getFullName();
             this.role = user.getRole();

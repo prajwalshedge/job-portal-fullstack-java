@@ -30,6 +30,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
+                        .requestMatchers("/api/jobs").hasAnyRole("RECRUITER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").hasAnyRole("RECRUITER", "ADMIN")
+                        .requestMatchers("/api/jobs/*/apply").hasRole("USER")
+                        .requestMatchers("/api/applications/my").hasRole("USER")
+                        .requestMatchers("/api/jobs/*/applications").hasAnyRole("RECRUITER", "ADMIN")
+                        .requestMatchers("/api/applications/*/status").hasAnyRole("RECRUITER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

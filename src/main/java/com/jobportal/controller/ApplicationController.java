@@ -19,7 +19,7 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     @PostMapping("/jobs/{jobId}/apply")
-    @PreAuthorize("hasRole('JOB_SEEKER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Application> apply(@PathVariable Long jobId,
                                              @RequestBody JobDto.ApplicationRequest request,
                                              Principal principal) {
@@ -27,19 +27,19 @@ public class ApplicationController {
     }
 
     @GetMapping("/applications/my")
-    @PreAuthorize("hasRole('JOB_SEEKER')")
+    @PreAuthorize("hasRole('USER')")
     public List<Application> myApplications(Principal principal) {
         return applicationService.myApplications(principal.getName());
     }
 
     @GetMapping("/jobs/{jobId}/applications")
-    @PreAuthorize("hasRole('EMPLOYER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('RECRUITER') or hasRole('ADMIN')")
     public List<Application> getByJob(@PathVariable Long jobId) {
         return applicationService.getByJob(jobId);
     }
 
     @PatchMapping("/applications/{id}/status")
-    @PreAuthorize("hasRole('EMPLOYER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('RECRUITER') or hasRole('ADMIN')")
     public Application updateStatus(@PathVariable Long id,
                                     @RequestBody JobDto.StatusUpdateRequest request) {
         return applicationService.updateStatus(id, request);

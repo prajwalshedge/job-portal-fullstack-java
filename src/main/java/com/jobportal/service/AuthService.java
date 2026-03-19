@@ -30,13 +30,26 @@ public class AuthService {
         user.setRole(request.getRole());
         userRepository.save(user);
 
-        return new AuthDto.AuthResponse(jwtUtil.generateToken(user.getEmail()), user);
+        return toAuthResponse(user);
     }
 
     public AuthDto.AuthResponse login(AuthDto.LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
-        return new AuthDto.AuthResponse(jwtUtil.generateToken(user.getEmail()), user);
+        return toAuthResponse(user);
+    }
+
+    public AuthDto.MeResponse me(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new AuthDto.MeResponse(user);
+    }
+
+    private AuthDto.AuthResponse toAuthResponse(User user) {
+        return new AuthDto.AuthResponse(
+                jwtUtil.generateToken(user),
+                jwtUtil.generateRefreshToken(user),
+                user);
     }
 }

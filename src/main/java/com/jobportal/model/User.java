@@ -24,10 +24,10 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.JOB_SEEKER;
+    private Role role = Role.USER;
 
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public enum Role { JOB_SEEKER, EMPLOYER, ADMIN }
+    public enum Role { USER, RECRUITER, ADMIN }
 }

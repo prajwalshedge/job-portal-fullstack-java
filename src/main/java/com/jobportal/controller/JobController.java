@@ -30,13 +30,13 @@ public class JobController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('EMPLOYER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('RECRUITER') or hasRole('ADMIN')")
     public ResponseEntity<Job> create(@Valid @RequestBody JobDto.JobRequest request, Principal principal) {
         return ResponseEntity.status(201).body(jobService.create(request, principal.getName()));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('EMPLOYER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('RECRUITER') or hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id, Principal principal) {
         jobService.delete(id, principal.getName());
         return ResponseEntity.noContent().build();
