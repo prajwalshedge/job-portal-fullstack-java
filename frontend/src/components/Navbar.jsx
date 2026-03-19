@@ -25,6 +25,7 @@ export default function Navbar() {
 
         {user?.role === 'USER'      && <Link to="/profile"   className="hover:text-blue-200 transition">Profile</Link>}
         {user?.role === 'RECRUITER' && <Link to="/dashboard" className="hover:text-blue-200 transition">Dashboard</Link>}
+        {user?.role === 'ADMIN'     && <Link to="/admin"     className="hover:text-blue-200 transition">Admin</Link>}
 
         {user && (
           <div className="flex items-center gap-3">

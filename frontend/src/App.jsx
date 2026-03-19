@@ -8,6 +8,7 @@ import JobsPage               from './pages/JobsPage';
 import JobDetailPage          from './pages/JobDetailPage';
 import RecruiterDashboard     from './pages/RecruiterDashboard';
 import ProfilePage            from './pages/ProfilePage';
+import AdminDashboard         from './pages/AdminDashboard';
 
 export default function App() {
   return (
@@ -34,6 +35,11 @@ export default function App() {
             {/* Recruiter */}
             <Route path="/dashboard" element={
               <ProtectedRoute role="RECRUITER"><RecruiterDashboard /></ProtectedRoute>
+            } />
+
+            {/* Admin */}
+            <Route path="/admin" element={
+              <ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>
             } />
 
             <Route path="*" element={<Navigate to="/jobs" replace />} />
