@@ -32,8 +32,8 @@ public class User {
     @Column(length = 20)
     private String phone;
 
-    // Comma-separated skill tags, e.g. "Java,Spring,SQL"
-    @Column(length = 500)
+    // Comma-separated skill tags extracted from resume
+    @Column(length = 2000)
     private String skills;
 
     @Column(name = "resume_link")
