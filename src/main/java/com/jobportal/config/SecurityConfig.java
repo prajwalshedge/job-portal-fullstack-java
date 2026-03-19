@@ -26,6 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configure(http))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
@@ -40,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/match/job/*/candidates").hasAnyRole("RECRUITER", "ADMIN")
                         .requestMatchers("/api/match/job/*/recompute").hasAnyRole("RECRUITER", "ADMIN")
                         .requestMatchers("/api/match/job/*/my-score").hasRole("USER")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
