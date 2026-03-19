@@ -9,6 +9,7 @@ import com.jobportal.repository.JobRepository;
 import com.jobportal.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,7 +20,9 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository        userRepository;
     private final JobRepository         jobRepository;
+    private final EmailService          emailService;
 
+    @Transactional
     public Application apply(Long jobId, JobDto.ApplicationRequest request, String email) {
         User applicant = userRepository.findByEmail(email).orElseThrow();
         if (applicationRepository.existsByJobIdAndApplicantId(jobId, applicant.getId()))
@@ -32,7 +35,10 @@ public class ApplicationService {
         app.setJob(job);
         app.setApplicant(applicant);
         app.setCoverLetter(request.getCoverLetter());
-        return applicationRepository.save(app);
+        Application saved = applicationRepository.save(app);
+
+        emailService.sendApplicationConfirmation(saved); // async — non-blocking
+        return saved;
     }
 
     public List<Application> myApplications(String email) {
@@ -44,10 +50,13 @@ public class ApplicationService {
         return applicationRepository.findByJobId(jobId);
     }
 
+    @Transactional
     public Application updateStatus(Long appId, JobDto.StatusUpdateRequest request) {
         Application app = applicationRepository.findById(appId)
                 .orElseThrow(() -> new RuntimeException("Application not found"));
         app.setStatus(request.getStatus());
-        return applicationRepository.save(app);
+        Application saved = applicationRepository.save(app);
+        emailService.sendStatusUpdate(saved);             // async — non-blocking
+        return saved;
     }
 }
